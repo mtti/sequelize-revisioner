@@ -1,0 +1,25 @@
+{
+  "name": "sequelize-revisioner",
+  "engines": {
+    "node": ">=6.9.4"
+  },
+  "private": true,
+  "version": "0.0.1",
+  "description": "Simple revisions for Sequelize models",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint \"index.js\" \"src/**/*.js\"",
+    "lint:fix": "eslint --fix \"index.js\" \"src/**/*.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mtti",
+  "license": "MIT",
+  "dependencies": {
+    "sequelize": "^4.6.0"
+  },
+  "devDependencies": {
+    "eslint": "4.5.0",
+    "eslint-config-airbnb-base": "11.3.1",
+    "eslint-plugin-import": "2.7.0"
+  }
+}
