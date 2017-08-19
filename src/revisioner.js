@@ -1,4 +1,6 @@
+const _ = require('lodash');
 const Sequelize = require('sequelize');
+const uuidv4 = require('uuid/v4');
 
 class Revisioner {
   constructor(sequelize, options = {}) {
@@ -6,14 +8,14 @@ class Revisioner {
 
     this.options = {
       modelName: options.modelName || 'revision',
-      uuidPrimaryKey: options.uuidRevisionPrimaryKey || false,
+      uuidPrimaryKey: options.uuidPrimaryKey || false,
       instancePrimaryKeyType: options.instancePrimaryKeyType || Sequelize.INTEGER,
-      jsonn: options.jsonb || false,
+      jsonb: options.jsonb || false,
     };
 
     const model = {};
 
-    if (this.options.uuidRevisionPrimaryKey) {
+    if (this.options.uuidPrimaryKey) {
       model.id = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -67,7 +69,12 @@ class Revisioner {
         instanceId: instance.id,
         body: instance.get({ plain: true }),
       };
-      return this.model.build(revision).save({ transaction: hookOptions.transaction });
+
+      if (this.options.uuidPrimaryKey) {
+        revision.id = uuidv4();
+      }
+
+      return this.model.create(revision, { transaction: hookOptions.transaction });
     });
 
     if (destroy) {
@@ -79,6 +86,26 @@ class Revisioner {
         transaction: hookOptions.transaction,
       }));
     }
+  }
+
+  findFor(instance, options = {}) {
+    const optionsCopy = _.cloneDeep(options);
+
+    if (!optionsCopy.attributes) {
+      optionsCopy.attributes = ['id', 'createdAt'];
+    }
+
+    if (!optionsCopy.where) {
+      optionsCopy.where = {};
+    }
+    optionsCopy.where.instanceId = instance.id;
+    optionsCopy.where.instanceType = instance.constructor.name;
+
+    if (!optionsCopy.order) {
+      optionsCopy.order = [['createdAt', 'ASC']];
+    }
+
+    return this.model.findAll(optionsCopy);
   }
 }
 
