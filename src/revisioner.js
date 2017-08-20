@@ -88,7 +88,7 @@ class Revisioner {
     }
   }
 
-  findFor(instance, options = {}) {
+  findAll(parent, options = {}) {
     const optionsCopy = _.cloneDeep(options);
 
     if (!optionsCopy.attributes) {
@@ -98,14 +98,25 @@ class Revisioner {
     if (!optionsCopy.where) {
       optionsCopy.where = {};
     }
-    optionsCopy.where.instanceId = instance.id;
-    optionsCopy.where.instanceType = instance.constructor.name;
+    optionsCopy.where.instanceId = parent.id;
+    optionsCopy.where.instanceType = parent.constructor.name;
 
     if (!optionsCopy.order) {
       optionsCopy.order = [['createdAt', 'ASC']];
     }
 
     return this.model.findAll(optionsCopy);
+  }
+
+  findOne(parent, revisionId) {
+    const options = {
+      where: {
+        id: revisionId,
+        instanceId: parent.id,
+        instanceType: parent.constructor.name,
+      },
+    };
+    return this.model.findOne(options);
   }
 }
 
